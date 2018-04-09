@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import Book from './Book'; 
-import books from './data';
-require('./utils/array-extensions');
+import Book from './Book';  
+import { groupBy } from './utils/array-extensions';
 
 function splitWords(s){
     const matcher=/[A-Za-z][^A-Z]*[a-z]+?/g;
@@ -16,7 +15,10 @@ function splitWords(s){
 
 export default class ListBooks extends Component {
     render() {
-        const groups=books.groupBy('shelf');
+
+        const { books }=this.props;
+        const groups=groupBy(books,'shelf');
+
         return (
             <div className="list-books">
                 <div className="list-books-title">

@@ -1,5 +1,6 @@
-Array.prototype.groupBy = function(prop) {
-    return this.reduce(function(groups, item) {
+// Array.prototype.groupBy = function(prop) {
+export function groupBy(array,prop) {
+    return array.reduce(function(groups, item) {
         let val = ''
         if (Array.isArray(prop)) {
             val = prop.reduce(function(str, k) {
