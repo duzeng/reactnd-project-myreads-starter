@@ -19,18 +19,39 @@ class BooksApp extends React.Component {
     }
 
     componentDidMount(){
-        BooksAPI.getAll().then(books=>this.setState({books}));
+        this.getAllBooks();
     }
 
+    refreshHandler=(data)=>{ 
+        const { books }=this.state;
+        Object.entries(data).forEach(item=>{
+            debugger
+            const [key,arr]=item;
+            if (arr.length===0) return;
+            arr.map(id=>{
+                const book=books.find(item=>item.id===id);
+                if (!book) return; 
+                if (book.shelf!==key) {
+                    book.shelf=key
+                }
+            })  
+        })
+        this.setState({books});
+    } 
+
+    getAllBooks(){
+        BooksAPI.getAll().then(books=>this.setState({books}));
+    }
+    
     render() {
         const { books }=this.state;
         return (
             <div className="app">
                 <Route path="/search" render={()=>(
-                    <SearchBooks />
+                    <SearchBooks books={books}/>
                 )} />
                 <Route exact path="/" render={()=>(
-                    <ListBooks books={books}/>
+                    <ListBooks books={books} onRefreshBooks={this.refreshHandler}/>
                 )} /> 
             </div>
         )

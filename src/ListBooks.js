@@ -1,19 +1,32 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import Book from './Book';  
+import PropTypes from 'prop-types';
+import Book from './Book'; 
+import * as BooksAPI from './BooksAPI' 
 import { groupBy } from './utils/array-extensions';
 
 function splitWords(s){
     const matcher=/[A-Za-z][^A-Z]*[a-z]+?/g;
     let result,thisArr=[]; 
     while (result=matcher.exec(s)){  
-        thisArr.push([result[0][0].toLocaleUpperCase(),...result[0].substring(1)].join(''))
+        thisArr.push([result[0][0].toLocaleUpperCase(),...result[0].substring(1)].join(''));
     }
-    return thisArr.join(' ')
+    return thisArr.join(' ');
  
 }
 
 export default class ListBooks extends Component {
+
+    static propTypes={
+        books:PropTypes.array.isRequired,
+        onRefreshBooks:PropTypes.func
+    } 
+ 
+    refreshHandler=(data)=>{ 
+        const { onRefreshBooks }=this.props;
+        onRefreshBooks && onRefreshBooks(data);
+    } 
+   
     render() {
 
         const { books }=this.props;
@@ -37,7 +50,7 @@ export default class ListBooks extends Component {
                                         <ol className="books-grid">
                                             {value.map((book,index)=>(
                                                 <li key={index}>
-                                                    <Book book={book}/>
+                                                    <Book book={book} onRefresh={this.refreshHandler}/>
                                                 </li>
                                             ))} 
                                         </ol>

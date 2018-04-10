@@ -1,37 +1,44 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Book from './Book';
 
 import * as BooksAPI from './BooksAPI';
 
 export default class SearchBooks extends Component {
+
+    static propTypes={
+        books:PropTypes.array.isRequired
+    } 
     constructor(props){
         super(props);
         this.state={
             searchText:'',
-            books:[]
+            searchedBooks:[]
         }
-    }
-    componentDidMount(){
-
-    }
+    } 
 
     changeSearchTextHandler=(text)=>{
         this.setState({ searchText:text });
 
         if (text){
-            BooksAPI.search(text).then(books=> {
-                if (!books) return;
-                if (books.error && books.error==='empty query') return;
-                this.setState({books})
+            BooksAPI.search(text).then(data=> {
+                if (!data) return;
+                if (data.error && data.error==='empty query') return;
+                this.setState({searchedBooks:data})
             } );
         }
 
     }
 
     render() {
-        const { books }=this.state;
-        console.log(books);
+        const { searchedBooks }=this.state; 
+        const { books }=this.props;
+        searchedBooks.map(item=>{
+            const result=books.find(book=> book.id===item.id);
+            if (!result) return;
+            item.shelf=result.shelf;
+        })
         return (
             <div className="search-books">
                 <div className="search-books-bar">
@@ -54,7 +61,7 @@ export default class SearchBooks extends Component {
                 </div>
                 <div className="search-books-results">
                     <ol className="books-grid">
-                        {books.map((book,index)=>(
+                        {searchedBooks.map((book,index)=>(
                             <li key={index}>
                                 <Book book={book}/>
                             </li>

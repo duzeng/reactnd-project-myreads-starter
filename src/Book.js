@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import * as BooksAPI from './BooksAPI';
 
 const options=[
@@ -9,12 +10,20 @@ const options=[
 ]
 export default class Book extends Component {
 
-    changeShelfHandler=(book,shelf)=>{ 
-        BooksAPI.update(book,shelf).then(data=>console.log(data))
+    static propTypes={
+        book:PropTypes.object.isRequired,
+        onRefresh:PropTypes.func
     }
+
+    changeShelfHandler=(book,shelf)=>{ 
+        const { onRefresh }=this.props;
+        BooksAPI.update(book,shelf).then(data=> onRefresh && onRefresh(data))
+    }
+
     render() {
         const { title,authors,imageLinks,shelf='none' }=this.props.book;
         const { width=128,height=193 }=imageLinks;
+
         return (
             <div className="book">
                 <div className="book-top">
@@ -23,7 +32,7 @@ export default class Book extends Component {
                         <select value={shelf} onChange={(event)=>this.changeShelfHandler(this.props.book,event.target.value)}>
                             <option value="none" disabled>Move to...</option>
                             {options.map(item=>(
-                                <option key={item.value} value={ item.value }>{ item.label }</option>
+                                <option key={item.value} value={ item.value }>{ shelf===item.value ? '√  '+item.label:item.label }</option>
                             ))}
                             {/* <option value="currentlyReading">Currently Reading</option>
                             <option value="wantToRead">Want to Read</option>
