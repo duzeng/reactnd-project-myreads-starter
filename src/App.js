@@ -7,14 +7,7 @@ import SearchBooks from './SearchBooks';
 import ListBooks from './ListBooks'; 
 
 class BooksApp extends React.Component {
-    state = {
-        /**
-         * TODO: Instead of using this state variable to keep track of which page
-         * we're on, use the URL in the browser's address bar. This will ensure that
-         * users can use the browser's back and forward buttons to navigate between
-         * pages, as well as provide a good URL they can bookmark and share.
-         */
-        //showSearchPage: false
+    state = { 
         books:[]
     }
 
@@ -22,22 +15,39 @@ class BooksApp extends React.Component {
         this.getAllBooks();
     }
 
-    refreshHandler=(data)=>{ 
+    /**
+     * when in home page,
+     */
+    refreshHandler=(responseData)=>{  
         const { books }=this.state;
-        Object.entries(data).forEach(item=>{
-            debugger
+        //change book's shelf
+        Object.entries(responseData).forEach(item=>{ 
             const [key,arr]=item;
             if (arr.length===0) return;
-            arr.map(id=>{
+            arr.forEach(id=>{
                 const book=books.find(item=>item.id===id);
                 if (!book) return; 
                 if (book.shelf!==key) {
-                    book.shelf=key
+                    book.shelf=key;
                 }
-            })  
-        })
-        this.setState({books});
+            });  
+        });
+        
+        //delete that not belonging to any shelf
+        const filterBooks=books.filter(item=>{
+            const ids= responseData[item.shelf];
+            return ids.includes(item.id); 
+        });
+
+        this.setState({books:filterBooks});
     } 
+
+    /**
+     * get all books via BooksAPI again
+     */
+    repullHandler=()=>{ 
+        this.getAllBooks();
+    }
 
     getAllBooks(){
         BooksAPI.getAll().then(books=>this.setState({books}));
@@ -48,7 +58,7 @@ class BooksApp extends React.Component {
         return (
             <div className="app">
                 <Route path="/search" render={()=>(
-                    <SearchBooks books={books}/>
+                    <SearchBooks books={books} onRefreshBooks={this.repullHandler}/>
                 )} />
                 <Route exact path="/" render={()=>(
                     <ListBooks books={books} onRefreshBooks={this.refreshHandler}/>

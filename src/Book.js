@@ -15,19 +15,21 @@ export default class Book extends Component {
         onRefresh:PropTypes.func
     }
 
+    /**
+     * change the book's shelf
+     */
     changeShelfHandler=(book,shelf)=>{ 
         const { onRefresh }=this.props;
         BooksAPI.update(book,shelf).then(data=> onRefresh && onRefresh(data))
     }
 
-    render() {
-        const { title,authors,imageLinks,shelf='none' }=this.props.book;
-        const { width=128,height=193 }=imageLinks;
-
+    render() { 
+        const { title,authors,imageLinks={},shelf='none' }=this.props.book;
+        const { thumbnail='' }=imageLinks; 
         return (
             <div className="book">
                 <div className="book-top">
-                    <div className="book-cover" style={{ width: width , height: height, backgroundImage: `url('${imageLinks.thumbnail}')` }}></div>
+                    <div className="book-cover" style={{ width: 128 , height: 193, backgroundImage: `url('${thumbnail}')` }}></div>
                     <div className="book-shelf-changer">
                         <select value={shelf} onChange={(event)=>this.changeShelfHandler(this.props.book,event.target.value)}>
                             <option value="none" disabled>Move to...</option>

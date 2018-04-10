@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Book from './Book'; 
-import * as BooksAPI from './BooksAPI' 
+import Book from './Book';  
 import { groupBy } from './utils/array-extensions';
 
 function splitWords(s){
     const matcher=/[A-Za-z][^A-Z]*[a-z]+?/g;
-    let result,thisArr=[]; 
+    let result,thisArr=[];  
     while (result=matcher.exec(s)){  
         thisArr.push([result[0][0].toLocaleUpperCase(),...result[0].substring(1)].join(''));
-    }
+    } 
+
     return thisArr.join(' ');
  
 }
@@ -62,7 +62,6 @@ export default class ListBooks extends Component {
                     </div>
                 </div>
                 <div className="open-search">
-                    {/* <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a> */}
                     <Link to="/search">Add a book</Link>
                 </div>
             </div>
