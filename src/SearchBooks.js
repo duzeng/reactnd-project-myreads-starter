@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+
+import * as _ from 'lodash';
+
 import Book from './Book';
 
 import * as BooksAPI from './BooksAPI';
@@ -32,15 +35,22 @@ export default class SearchBooks extends Component {
      * serach text changed, invoke this
      */
     changeSearchTextHandler=(text)=>{ 
+    
         this.setState({ searchText:text });
+        if (!text) return; 
+        this.packFunc(text);
+    }
+
+    packFunc=_.debounce((text)=>{ 
+     
         if (!text) return;
         BooksAPI.search(text).then(data=> {
+            console.log(data)
             if (!data) return;
             if (data.error && data.error==='empty query') return;
             this.setState({searchedBooks:data})
-        } ); 
-
-    }
+        } );  
+    },1000);
 
     render() {
         const { searchedBooks }=this.state; 
