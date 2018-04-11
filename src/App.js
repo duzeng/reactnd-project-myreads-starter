@@ -18,36 +18,67 @@ class BooksApp extends React.Component {
     /**
      * when in home page,
      */
-    refreshHandler=(responseData)=>{  
-        const { books }=this.state;
-        //change book's shelf
-        Object.entries(responseData).forEach(item=>{ 
-            const [key,arr]=item;
-            if (arr.length===0) return;
-            arr.forEach(id=>{
-                const book=books.find(item=>item.id===id);
-                if (!book) return; 
-                if (book.shelf!==key) {
-                    book.shelf=key;
-                }
-            });  
-        });
-        
-        //delete that not belonging to any shelf
-        const filterBooks=books.filter(item=>{
-            const ids= responseData[item.shelf];
-            return ids.includes(item.id); 
-        });
+    refreshHandler=(responseData)=>{   
+        this.setState(prevState=>{
+            const { books }=prevState;
+            
+            //change book's shelf
+            Object.entries(responseData).forEach(item=>{ 
+                const [key,arr]=item;
+                if (arr.length===0) return;
+                arr.forEach(id=>{
+                    const book=books.find(item=>item.id===id);
+                    if (!book) {
+                        BooksAPI.get(id).then(remoteBook=>books.push(remoteBook));
+                    }
+                    if (book.shelf!==key) {
+                        book.shelf=key;
+                    }
+                });  
+            });
+            
+            //delete that not belonging to any shelf
+            const filterBooks=books.filter(item=>{
+                const ids= responseData[item.shelf];
+                return ids.includes(item.id); 
+            });
+    
+            return {
+                books:filterBooks
+            };
 
-        this.setState({books:filterBooks});
+        })
+        // const { books }=this.state;
+        // //change book's shelf
+        // Object.entries(responseData).forEach(item=>{ 
+        //     const [key,arr]=item;
+        //     if (arr.length===0) return;
+        //     arr.forEach(id=>{
+        //         const book=books.find(item=>item.id===id);
+        //         if (!book) return; 
+        //         if (book.shelf!==key) {
+        //             book.shelf=key;
+        //         }
+        //     });  
+        // });
+        
+        // //delete that not belonging to any shelf
+        // const filterBooks=books.filter(item=>{
+        //     const ids= responseData[item.shelf];
+        //     return ids.includes(item.id); 
+        // });
+
+        // this.setState({books:filterBooks});
     } 
 
     /**
      * get all books via BooksAPI again
      */
-    repullHandler=()=>{ 
-        this.getAllBooks();
-    }
+    // repullHandler=(data)=>{ 
+    //     console.log(data);
+    //     debugger
+    //     this.getAllBooks();
+    // }
 
     getAllBooks(){
         BooksAPI.getAll().then(books=>this.setState({books}));
@@ -58,7 +89,7 @@ class BooksApp extends React.Component {
         return (
             <div className="app">
                 <Route path="/search" render={()=>(
-                    <SearchBooks books={books} onRefreshBooks={this.repullHandler}/>
+                    <SearchBooks books={books} onRefreshBooks={this.refreshHandler}/>
                 )} />
                 <Route exact path="/" render={()=>(
                     <ListBooks books={books} onRefreshBooks={this.refreshHandler}/>
